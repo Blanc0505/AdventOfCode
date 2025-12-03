@@ -26,6 +26,31 @@ int LargestVolt(std::string& s)
     return maxJoltage;
 }
 
+long long LargestVoltZusatz(std::string& s)
+{
+    int len = s.length();
+    int remove = len - 12;
+    std::string result;
+    
+    for(char c : s)
+    {
+        while(remove > 0 && !result.empty() && result.back() < c)
+        {
+            result.pop_back();
+            remove--;
+        }
+        result.push_back(c);
+    }
+    
+    result.resize(12);
+    long long maxJoltage = 0;
+    for(char c : result)
+    {
+        int d = c - '0';
+        maxJoltage = maxJoltage * 10 + d;
+    }
+    return maxJoltage;
+}
 
 int main()
 {
@@ -39,11 +64,12 @@ int main()
     }
 
     std::string line;
-    int totalJoltage = 0;
+    long long totalJoltage = 0;
 
     while(std::getline(file, line))
     {
-        totalJoltage += LargestVolt(line);
+        // Part 1: totalJoltage += LargestVolt(line);
+        // Part 2: totalJoltage += LargestVoltZusatz(line);
     }
 
     std::cout << totalJoltage << std::endl;
