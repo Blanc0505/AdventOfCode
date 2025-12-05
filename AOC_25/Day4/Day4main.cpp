@@ -28,19 +28,17 @@ long long CheckNeighboors(std::vector<std::string>& grid, int rows, int cols)
             if(grid[i][j] != '@') continue;
 
             int neighborRolls = 0;
-            if(grid[i][j] == '@')
+            
+            for(const auto& offset: neighborOffsets)
             {
-                for(const auto& offset: neighborOffsets)
-                {
-                    int ri = i + offset.first;
-                    int rj = j + offset.second;
+                int ri = i + offset.first;
+                int rj = j + offset.second;
                     
-                    if(ri < 0 || rj < 0 || ri >= rows || rj >= cols) continue;
+                if(ri < 0 || rj < 0 || ri >= rows || rj >= cols) continue;
                     
-                    if(grid[ri][rj] == '@') ++neighborRolls;
-                }
-                if(neighborRolls < 4) ++goodRolls;
+                if(grid[ri][rj] == '@') ++neighborRolls;
             }
+            if(neighborRolls < 4) ++goodRolls;
         }
     }
     return goodRolls;
@@ -48,7 +46,8 @@ long long CheckNeighboors(std::vector<std::string>& grid, int rows, int cols)
 
 long long CheckNeighboorsZusatz(std::vector<std::string>& grid, int rows, int cols)
 {
-    long long goodRolls = 0;
+    long long totalRemoved = 0;
+    
     std::vector<std::pair<int, int>> neighborOffsets =
     {
         {-1, 0},    // Directly above
@@ -61,33 +60,39 @@ long long CheckNeighboorsZusatz(std::vector<std::string>& grid, int rows, int co
         {1, 1}      // Diagonal lower right
     };
 
-    for(int i = 0; i < rows; ++i)
+    while(true)
     {
-        for(int j = 0; j < cols; ++j)
+        std::vector<std::pair<int, int>> toRemove;
+        
+        for(int i = 0; i < rows; ++i)
         {
-            if(grid[i][j] != '@') continue;
-
-            int neighborRolls = 0;
-            if(grid[i][j] == '@')
+            for(int j = 0; j < cols; ++j)
             {
+                if(grid[i][j] != '@') continue;
+
+                int neighborRolls = 0;
+                
                 for(const auto& offset: neighborOffsets)
                 {
                     int ri = i + offset.first;
                     int rj = j + offset.second;
-                    
+                        
                     if(ri < 0 || rj < 0 || ri >= rows || rj >= cols) continue;
-                    
-                    if(grid[ri][rj] == '@')
-                    {
-                        ++neighborRolls;
-                        grid[ri][rj] = '.';
-                    }   
+                        
+                    if(grid[ri][rj] == '@') ++neighborRolls;
                 }
-                if(neighborRolls < 4) ++goodRolls;
+                if(neighborRolls < 4) toRemove.push_back({i, j});
             }
         }
+        if(toRemove.empty()) break;
+
+        for(auto [r, c] : toRemove)
+        {
+            grid[r][c] = '.';
+            ++totalRemoved;
+        }
     }
-    return goodRolls;
+    return totalRemoved;
 }
 
 int main()
@@ -113,8 +118,8 @@ int main()
     int cols = grid[0].size();
     
     long long result = CheckNeighboors(grid, rows, cols);
+    long long resultZusatz = CheckNeighboorsZusatz(grid, rows, cols);
 
-    std::cout << grid[0][4];
-    std::cout << result << std::endl;
-    
+    std::cout << "Part 1: " << result << std::endl;
+    std::cout << "Part 2: " << resultZusatz << std::endl;
 }
