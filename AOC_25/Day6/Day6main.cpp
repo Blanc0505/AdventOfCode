@@ -5,7 +5,7 @@
 #include <sstream>
 #include <algorithm>
 
-long long SumOfAnswers(std::vector<std::string>& grid, std::vector<std::pair<int, int>>& NumBlocks, int rows, int cols)
+long long SumOfAnswers(std::vector<std::string>& grid, std::vector<std::pair<int, int>>& NumBlocks, int rows)
 {
     long long totalSum = 0;
 
@@ -50,6 +50,51 @@ long long SumOfAnswers(std::vector<std::string>& grid, std::vector<std::pair<int
     return totalSum;
 }
 
+long long SumOfAnswersPartTwo(std::vector<std::string>& grid, std::vector<std::pair<int, int>>& NumBlocks, int rows)
+{
+    long long totalSum = 0;
+    std::reverse(NumBlocks.begin(), NumBlocks.end());
+
+    for(const auto& [startCol, endCol] : NumBlocks)
+    {
+        std::vector<int> numbers;
+        char op;
+        for(int c = startCol; c <= endCol; ++c)
+        {
+            std::string currentNum;
+
+            for(int r = 0; r < rows; ++r)
+            {
+                if(grid[r][c] != ' ' && grid[r][c] != '*' && grid[r][c] != '+')
+                {
+                    currentNum.push_back(grid[r][c]);
+                }
+                else if(grid[r][c] == '*') op = '*';
+                else if(grid[r][c] == '+') op = '+';
+            }
+            if(!currentNum.empty()) numbers.push_back(std::stoi(currentNum));
+        }
+        if(op == '*')
+        {
+            long long erg = 1;
+            for(auto& num : numbers)
+            {
+                erg *= num;
+            }
+            totalSum += erg;
+        }
+        else if(op == '+')
+        {
+            long long erg = 0;
+            for(auto& num : numbers)
+            {
+                erg += num;
+            }
+            totalSum += erg;
+        }
+    }
+    return totalSum;
+}
 
 int main()
 {
@@ -116,10 +161,13 @@ int main()
     }
 
 
-    std::cout << "Part 1: " << SumOfAnswers(grid, NumBlocks, rows, cols) << std::endl;
+    std::cout << "Part 1: " << SumOfAnswers(grid, NumBlocks, rows) << std::endl;
+    std::cout << "Part 2: " << SumOfAnswersPartTwo(grid, NumBlocks, rows) << std::endl;
 
+    /*
     for(const auto& c : NumBlocks)
     {
-        // For DB: std::cout << "[ " << c.first << ", " << c.second << " ]" << std::endl;
+        For DB: std::cout << "[ " << c.first << ", " << c.second << " ]" << std::endl;
     }
+    */
 }
